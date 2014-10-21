@@ -1,0 +1,23 @@
+*, *:before, *:after {
+
+	box-sizing: border-box;
+}
+
+
+.main {
+	border: solid 3em black;
+	display: block;
+	font-size: 0;
+	text-align: justify;
+	margin: 0 auto;
+
+
+}
+
+.left-column {
+
+
+
+
+
+}
