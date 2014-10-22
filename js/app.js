@@ -33,8 +33,9 @@ function EtsyClient(options) {
     this.version = options.api_version || "v2/";
     this.api_key = options.api_key;
     this.complete_api_url = this.etsy_url + this.version;
-    this.init();
+    this.setupRouting();
 }
+
 
 EtsyClient.prototype.pullAllActiveListings = function() {
 
@@ -44,6 +45,7 @@ EtsyClient.prototype.pullAllActiveListings = function() {
         return data;
     });
 };
+
 
 EtsyClient.prototype.pullSingleListing = function(id) {
     var model = 'listings';
@@ -71,6 +73,7 @@ EtsyClient.prototype.drawListings = function(listingsHtml, listings) {
 
 };
 
+
 EtsyClient.prototype.drawSingleListing = function(id) {
 
     var listing = this.latestData.results.fitler(function(listing) {
@@ -86,30 +89,67 @@ EtsyClient.prototype.drawSingleListing = function(id) {
 
 };
 
-// EtsyClient.prototype.setupRouting = function() {}
 
-// EtsyClient.prototype.getUserInfo = function() {
-
-
-//     return $.getJSON(this.complete_api_url + "users/'user_id'.js?api_key=" + this.api_key + "&callback=?").then(function(data) {
-//         return data;
-//     });
-// };
-
-EtsyClient.prototype.init = function() {
+EtsyClient.prototype.setupRouting = function() {
     var self = this;
-    // this.setupRouting();
-    $.when(
-        this.pullAllActiveListings(),
-        this.loadTemplate("listings"),
-        this.loadTemplate("listing")
-    ).then(function(data, html, singlePageHTML) {
 
-        self.newData = data;
-        self.listingHTML = html;
-        self.singleListingHtml = singlePageHTML;
 
-        Path.listen();
+    Path.map("#/").to(function() {
+        $.when(
+        	self.loadTemplate("listing"),
+        	self.pullAllActiveListings()
+        ).then(function() {
+            self.drawListings(arguments[0], arguments[1]);
+
+        	console.dir(self)
+
+        })
+
     });
 
-};
+
+        // EtsyClient.prototype.getUserInfo = function() {
+
+
+        //     return $.getJSON(this.complete_api_url + "users/'user_id'.js?api_key=" + this.api_key + "&callback=?").then(function(data) {
+        //         return data;
+        //     });
+        // };
+
+    Path.map("#/listing/:id").to(function() {
+        alert(this.params.anymessage);
+        })
+
+    Path.map("#/listing/:id").to(function() {
+        $.when(
+            self.loadTemplate("listing"),
+            self.pullSingleListing(this.params.id)
+        ).then(function() {
+
+    		self.drawSingleListing(arguments[0], arguments[1]);
+    	})
+    });
+
+	Path.root("#/");
+	Path.listen();
+
+}
+
+
+        // EtsyClient.prototype.init = function() {
+        //         var self = this;
+        //         // this.setupRouting();
+        //         $.when(
+        //             this.pullAllActiveListings(),
+        //             this.loadTemplate("listings"),
+        //             this.loadTemplate("listing")
+        //         ).then(function(data, html, singlePageHTML) {
+
+        //             self.newData = data;
+        //             self.listingHTML = html;
+        //             self.singleListingHtml = singlePageHTML;
+
+        //             Path.listen();
+        //         });
+
+        //     };
